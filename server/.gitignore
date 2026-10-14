@@ -1,0 +1,28 @@
+# Backend dependencies
+node_modules/
+
+# Backend environment files and secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+
+# Logs and runtime output
+logs/
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Test and coverage output
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
