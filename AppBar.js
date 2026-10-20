@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { uploadImage } from './context/AuthContext';
 
 export default function AppBar({ navigation }) {
-  const { contents, loading, canManage, updateContent, deleteContent } = useContents();
+  const { contents, loading, canManage, updateContent, deleteContent, toggleFavorite } = useContents();
   const [editing, setEditing] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -18,7 +18,7 @@ export default function AppBar({ navigation }) {
   const visibleContents = selectedTab === 'Todos'
     ? contents
     : selectedTab === 'Favoritos'
-      ? []
+      ? contents.filter((content) => content.isFavorite)
       : contents.filter((content) => (content.category || 'Séries') === selectedTab);
 
   const edit = (content) => {
@@ -53,6 +53,18 @@ export default function AppBar({ navigation }) {
     { text: 'Excluir', style: 'destructive', onPress: () => deleteContent(content._id).catch((error) => Alert.alert('Erro', error.message)) },
   ]);
 
+  const favorite = async (content) => {
+    if (!canManage) {
+      Alert.alert('Login necessário', 'Entre na sua conta para adicionar favoritos.');
+      return;
+    }
+    try {
+      await toggleFavorite(content._id);
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
+
   return (
     <View style={styles.home}>
       <Appbar.Header style={styles.header}>
@@ -79,7 +91,7 @@ export default function AppBar({ navigation }) {
       <ScrollView style={styles.cards} contentContainerStyle={styles.cardsContent}>
         {loading ? <Text style={styles.emptyText}>Carregando conteúdos...</Text> : null}
         {!loading && !visibleContents.length ? <Text style={styles.emptyText}>Nenhum conteúdo encontrado nesta categoria.</Text> : null}
-        {visibleContents.map((content) => <ModCard key={content._id} content={content} canManage={canManage} onEdit={edit} onDelete={remove} />)}
+        {visibleContents.map((content) => <ModCard key={content._id} content={content} canManage={canManage} onEdit={edit} onDelete={remove} onFavorite={() => favorite(content)} />)}
       </ScrollView>
 
       <Portal>

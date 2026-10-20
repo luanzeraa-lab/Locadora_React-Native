@@ -1,16 +1,24 @@
 import React from 'react';
-import { Text } from 'react-native'; // Adicionado para estilizar a descrição
-import { Card, Button } from 'react-native-paper';
+import { Text } from 'react-native';
+import { Card, Button, IconButton } from 'react-native-paper';
 import { styles } from './css/Styles';
 
-export default function ModCard({ content, canManage, onEdit, onDelete }) {
+export default function ModCard({ content, canManage, onEdit, onDelete, onFavorite }) {
   return (
     <Card style={styles.card}>
-      <Card.Title 
+      <Card.Title
         title={content.title} 
         subtitle={content.subtitle} 
         titleStyle={styles.cardTitle} 
         subtitleStyle={styles.cardSubtitle} // Adicionado para o subtítulo ficar legível
+        right={() => (
+          <IconButton
+            icon={content.isFavorite ? 'star' : 'star-outline'}
+            iconColor={content.isFavorite ? '#FBBF24' : '#9CA3AF'}
+            accessibilityLabel={content.isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            onPress={onFavorite}
+          />
+        )}
       />
       <Card.Cover style={styles.cardCover} source={{ uri: content.imageUrl }} />
       

@@ -32,7 +32,14 @@ export function ContentProvider({ children }) {
     setContents((items) => items.filter((item) => item._id !== id));
   };
 
-  return <ContentContext.Provider value={{ contents, loading, loadContents, createContent, updateContent, deleteContent, canManage: !!user }}>
+  const toggleFavorite = async (id) => {
+    const { isFavorite } = await request(`/contents/${id}/favorite`, { method: 'POST' });
+    setContents((items) => items.map((item) => (
+      item._id === id ? { ...item, isFavorite } : item
+    )));
+  };
+
+  return <ContentContext.Provider value={{ contents, loading, loadContents, createContent, updateContent, deleteContent, toggleFavorite, canManage: !!user }}>
     {children}
   </ContentContext.Provider>;
 }

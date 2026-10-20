@@ -114,6 +114,16 @@ export const styles = StyleSheet.create({
         lineHeight: 22,
     },
 
+    categoryLabel: {
+        color: '#F3F4F6',
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+
+    categorySelector: {
+        marginBottom: 16,
+    },
+
     adminCancelButton: {
         marginTop: 10,
         borderColor: '#6B7280',

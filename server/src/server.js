@@ -8,7 +8,7 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const { User, Content } = require('./models');
-const { createToken, authRequired } = require('./auth');
+const { createToken, authRequired, authOptional } = require('./auth');
 
 const app = express();
 app.use(cors());
@@ -104,12 +104,36 @@ app.put('/api/auth/me', authRequired, async (req, res, next) => {
   }
 });
 
-app.get('/api/contents', async (req, res, next) => {
+app.get('/api/contents', authOptional, async (req, res, next) => {
   try {
     const filter = req.query.search
       ? { $or: [{ title: new RegExp(req.query.search, 'i') }, { subtitle: new RegExp(req.query.search, 'i') }] }
       : {};
-    return res.json(await Content.find(filter).sort({ createdAt: -1 }));
+    const contents = await Content.find(filter).sort({ createdAt: -1 });
+    const favorites = req.user
+      ? ((await User.findById(req.user.id).select('favorites'))?.favorites || []).map(String)
+      : [];
+    return res.json(contents.map((content) => ({
+      ...content.toObject(),
+      isFavorite: favorites.includes(String(content._id)),
+    })));
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post('/api/contents/:id/favorite', authRequired, async (req, res, next) => {
+  try {
+    const content = await Content.findById(req.params.id).select('_id');
+    if (!content) return res.status(404).json({ message: 'Conteúdo não encontrado.' });
+    const user = await User.findById(req.user.id).select('favorites');
+    if (!user) return res.status(401).json({ message: 'Usuário não encontrado.' });
+    const favorite = (user.favorites || []).some((id) => String(id) === String(content._id));
+    const update = favorite
+      ? { $pull: { favorites: content._id } }
+      : { $addToSet: { favorites: content._id } };
+    await User.updateOne({ _id: user._id }, update);
+    return res.json({ isFavorite: !favorite });
   } catch (error) {
     return next(error);
   }
@@ -121,9 +145,12 @@ app.post('/api/contents', authRequired, async (req, res, next) => {
     if (!title?.trim() || !subtitle?.trim() || !imageUrl?.trim()) {
       return res.status(400).json({ message: 'Título, subtítulo e URL da imagem são obrigatórios.' });
     }
+    if (!['Filmes', 'Séries'].includes(category)) {
+      return res.status(400).json({ message: 'Selecione se o conteúdo é um filme ou uma série.' });
+    }
     return res.status(201).json(await Content.create({
       title: title.trim(), subtitle: subtitle.trim(), imageUrl: imageUrl.trim(),
-      description: description?.trim() || '', category: category?.trim() || 'Séries', createdBy: req.user.id,
+      description: description?.trim() || '', category, createdBy: req.user.id,
     }));
   } catch (error) {
     return next(error);

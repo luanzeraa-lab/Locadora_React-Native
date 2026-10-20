@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Appbar, Button, Text, TextInput } from 'react-native-paper';
+import { Appbar, Button, SegmentedButtons, Text, TextInput } from 'react-native-paper';
 import { useContents } from './context/ContentContext';
 import { useAuth } from './context/AuthContext';
 import { uploadImage } from './context/AuthContext';
 import { styles } from './css/Styles';
 
-const emptyForm = { title: '', subtitle: '', imageUrl: '', description: '' };
+const emptyForm = { title: '', subtitle: '', imageUrl: '', description: '', category: 'Séries' };
 
 export default function GerenciarConteudos({ navigation }) {
   const { createContent } = useContents();
@@ -81,6 +81,18 @@ export default function GerenciarConteudos({ navigation }) {
           {status.message}
         </Text>
       ) : null}
+
+      <Text style={styles.categoryLabel}>Tipo de conteúdo</Text>
+      <SegmentedButtons
+        value={form.category}
+        onValueChange={(value) => update('category', value)}
+        buttons={[
+          { value: 'Séries', label: 'Série' },
+          { value: 'Filmes', label: 'Filme' },
+        ]}
+        style={styles.categorySelector}
+        theme={{ colors: { secondaryContainer: '#8B5CF6', onSecondaryContainer: '#FFFFFF', outline: '#6B7280' } }}
+      />
       
       <TextInput 
         label="Título" 
@@ -128,7 +140,7 @@ export default function GerenciarConteudos({ navigation }) {
         mode="contained" 
         icon="plus" 
         onPress={save} 
-        disabled={!form.title || !form.subtitle || !form.imageUrl}
+        disabled={!form.title || !form.subtitle || !form.imageUrl || !form.category}
         buttonColor="#8B5CF6"
         textColor="#FFFFFF"
         style={{ marginTop: 10, borderRadius: 12 }} // Arredondamento acompanhando os outros botões do App
