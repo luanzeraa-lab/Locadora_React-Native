@@ -34,20 +34,21 @@ const Login = ({ navigation }) => {
 
     return (
 
-        <View style={styles.loginContainer}>
+        // Usamos height 100% para evitar o colapso de tela branca no Expo Web
+        <View style={{ height: '100%', backgroundColor: '#121212' }}>
 
             {/* APPBAR */}
 
-            <Appbar.Header >
+            <Appbar.Header style={{ backgroundColor: '#1E1E1E' }}>
 
                 <Appbar.BackAction
-                    iconColor="black"
+                    iconColor="#F3F4F6" // Ícone claro
                     onPress={() => navigation.goBack()}
                 />
 
                 <Appbar.Content
                     title="Login"
-                    titleStyle={styles.title}
+                    titleStyle={{ color: '#F3F4F6', fontWeight: 'bold' }} // Título claro
                 />
 
             </Appbar.Header>
@@ -83,8 +84,12 @@ const Login = ({ navigation }) => {
                     mode="outlined"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6" // Borda roxa ao focar
+                    outlineColor="#2C2C2C" // Borda cinza em repouso
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }} // Cor do texto do label/placeholder
                     left={
-                        <TextInput.Icon icon="email" />
+                        <TextInput.Icon icon="email" color="#9CA3AF" />
                     }
                     style={styles.input}
                 />
@@ -99,12 +104,17 @@ const Login = ({ navigation }) => {
                     onChangeText={setSenha}
                     mode="outlined"
                     secureTextEntry={!mostrarSenha}
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                     left={
-                        <TextInput.Icon icon="lock" />
+                        <TextInput.Icon icon="lock" color="#9CA3AF" />
                     }
                     right={
                         <TextInput.Icon
                             icon={mostrarSenha ? 'eye-off' : 'eye'}
+                            color="#9CA3AF" // Ícone do olhinho na mesma cor secundária
                             onPress={() =>
                                 setMostrarSenha(!mostrarSenha)
                             }
@@ -119,6 +129,8 @@ const Login = ({ navigation }) => {
                 <Button
                     mode="contained"
                     icon="login"
+                    buttonColor="#8B5CF6" // Roxo do tema
+                    textColor="#FFFFFF"
                     style={styles.loginButton}
                     onPress={entrar}
                     loading={sending}
@@ -133,6 +145,7 @@ const Login = ({ navigation }) => {
                 <Button
                     mode="text"
                     icon="account-plus"
+                    textColor="#8B5CF6" // Texto roxo combinando
                     onPress={() => navigation.navigate('Cadastro')}
                 >
                     NÃO TENHO CADASTRO

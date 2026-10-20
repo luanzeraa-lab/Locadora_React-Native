@@ -127,7 +127,7 @@ app.use((error, req, res, next) => {
 const port = 3333;
 async function start() {
   await mongoose.connect(
-    'mongodb://luan:minhanovasenha@ac-c4ltwfh-shard-00-00.5ozoan9.mongodb.net:27017,ac-c4ltwfh-shard-00-01.5ozoan9.mongodb.net:27017,ac-c4ltwfh-shard-00-02.5ozoan9.mongodb.net:27017/technologic?authSource=admin&replicaSet=atlas-sisqi2-shard-0&retryWrites=true&w=majority'
+    'mongodb+srv://luan:minhanovasenha@cluster0.5ozoan9.mongodb.net/technologic'
     , { tls: true }
   );
   app.listen(port, '0.0.0.0', () => console.log(`API disponível em http://localhost:${port}`));

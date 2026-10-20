@@ -19,13 +19,79 @@ export default function GerenciarConteudos() {
     }
   };
 
-  return <ScrollView style={styles.adminContainer} contentContainerStyle={styles.adminContent}>
-    <Text variant="headlineSmall" style={styles.adminTitle}>Gerenciar conteúdos</Text>
-    <Text style={styles.adminDescription}>Cadastre uma nova série ou imagem para exibição pública.</Text>
-    <TextInput label="Título" mode="outlined" value={form.title} onChangeText={(value) => update('title', value)} style={styles.input} />
-    <TextInput label="Subtítulo" mode="outlined" value={form.subtitle} onChangeText={(value) => update('subtitle', value)} style={styles.input} />
-    <TextInput label="URL da imagem" mode="outlined" value={form.imageUrl} onChangeText={(value) => update('imageUrl', value)} style={styles.input} autoCapitalize="none" />
-    <TextInput label="Descrição" mode="outlined" value={form.description} onChangeText={(value) => update('description', value)} style={styles.input} multiline />
-    <Button mode="contained" icon="plus" onPress={save} disabled={!form.title || !form.subtitle || !form.imageUrl}>Cadastrar conteúdo</Button>
-  </ScrollView>;
+  return (
+    <ScrollView style={styles.adminContainer} contentContainerStyle={styles.adminContent}>
+      
+      <Text variant="headlineSmall" style={styles.adminTitle}>
+        Gerenciar conteúdos
+      </Text>
+      
+      <Text style={styles.adminDescription}>
+        Cadastre uma nova série ou imagem para exibição pública.
+      </Text>
+      
+      <TextInput 
+        label="Título" 
+        mode="outlined" 
+        value={form.title} 
+        onChangeText={(value) => update('title', value)} 
+        textColor="#F3F4F6"
+        activeOutlineColor="#8B5CF6"
+        outlineColor="#2C2C2C"
+        theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
+        style={styles.input} 
+      />
+      
+      <TextInput 
+        label="Subtítulo" 
+        mode="outlined" 
+        value={form.subtitle} 
+        onChangeText={(value) => update('subtitle', value)} 
+        textColor="#F3F4F6"
+        activeOutlineColor="#8B5CF6"
+        outlineColor="#2C2C2C"
+        theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
+        style={styles.input} 
+      />
+      
+      <TextInput 
+        label="URL da imagem" 
+        mode="outlined" 
+        value={form.imageUrl} 
+        onChangeText={(value) => update('imageUrl', value)} 
+        autoCapitalize="none" 
+        textColor="#F3F4F6"
+        activeOutlineColor="#8B5CF6"
+        outlineColor="#2C2C2C"
+        theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
+        style={styles.input} 
+      />
+      
+      <TextInput 
+        label="Descrição" 
+        mode="outlined" 
+        value={form.description} 
+        onChangeText={(value) => update('description', value)} 
+        multiline 
+        textColor="#F3F4F6"
+        activeOutlineColor="#8B5CF6"
+        outlineColor="#2C2C2C"
+        theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
+        style={styles.input} 
+      />
+      
+      <Button 
+        mode="contained" 
+        icon="plus" 
+        onPress={save} 
+        disabled={!form.title || !form.subtitle || !form.imageUrl}
+        buttonColor="#8B5CF6"
+        textColor="#FFFFFF"
+        style={{ marginTop: 10, borderRadius: 12 }} // Arredondamento acompanhando os outros botões do App
+      >
+        Cadastrar conteúdo
+      </Button>
+      
+    </ScrollView>
+  );
 }

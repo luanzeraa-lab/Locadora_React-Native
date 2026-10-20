@@ -1,9 +1,10 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Avatar, Text, IconButton, Portal, Dialog, Button } from 'react-native-paper';
 import { Icon } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from './context/AuthContext';
+
 const CabecalhoMenu = () => {
   const { user, signOut } = useAuth();
   const navigation = useNavigation();
@@ -15,10 +16,7 @@ const CabecalhoMenu = () => {
     navigation.navigate('Início', { screen: 'Acesso' });
   };
 
-
-
   return (
-
     <View style={styles.container}>
 
       {/* Área do usuário */}
@@ -27,12 +25,12 @@ const CabecalhoMenu = () => {
         <Avatar.Icon
           size={65}
           icon="account"
+          color="#FFFFFF"
           style={styles.avatar}
         />
 
         {/* Nome e e-mail */}
         <View style={styles.informacoes}>
-
           <Text
             variant="titleMedium"
             style={styles.nome}
@@ -47,9 +45,7 @@ const CabecalhoMenu = () => {
           >
             {user?.email || 'Faça login para administrar'}
           </Text>
-
         </View>
-
       </View>
 
 
@@ -62,7 +58,7 @@ const CabecalhoMenu = () => {
         </Text>
         <IconButton
           icon="account"
-          iconColor="white"
+          iconColor="#F3F4F6"
           size={24}
           onPress={() => navigation.navigate('Início', { screen: user ? 'Perfil' : 'Acesso' })}
         />
@@ -78,7 +74,7 @@ const CabecalhoMenu = () => {
         </Text>
         <IconButton
           icon="bell"
-          iconColor="white"
+          iconColor="#F3F4F6"
           size={24}
           onPress={() => {}}
         />
@@ -93,7 +89,7 @@ const CabecalhoMenu = () => {
         </Text>
         <IconButton
           icon="magnify"
-          iconColor="white"
+          iconColor="#F3F4F6"
           size={24}
           onPress={() => navigation.navigate('Início', { screen: 'Pesquisa' })}
         />
@@ -108,7 +104,7 @@ const CabecalhoMenu = () => {
           </Text>
           <IconButton
             icon="playlist-plus"
-            iconColor="white"
+            iconColor="#F3F4F6"
             size={24}
             onPress={() => navigation.navigate('Início', { screen: 'Gerenciar conteúdos' })}
           />
@@ -124,11 +120,10 @@ const CabecalhoMenu = () => {
         </Text>
         <IconButton
           icon="logout"
-          iconColor="white"
+          iconColor="#EF4444" // Destacando o ícone de sair com vermelho suave
           size={24}
           onPress={() => setDialogSair(true)}
         />
-
       </View>
 
 
@@ -136,21 +131,24 @@ const CabecalhoMenu = () => {
       <Portal>
         <Dialog
           visible={dialogSair}
-          onDismiss={() => setDialogSair(false)}>
-          <Dialog.Title>Confirmar saída</Dialog.Title>
+          onDismiss={() => setDialogSair(false)}
+          style={{ backgroundColor: '#1E1E1E' }}> {/* Fundo do modal escuro */}
+          <Dialog.Title style={{ color: '#F3F4F6' }}>Confirmar saída</Dialog.Title>
           <Dialog.Content>
-            <Text>
+            <Text style={{ color: '#9CA3AF' }}>
               Deseja realmente sair do aplicativo?
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
+              textColor="#9CA3AF"
               onPress={() => setDialogSair(false)}>
               Cancelar
             </Button>
 
             <Button
-              onPress={confirmarSaida}   >
+              textColor="#EF4444" // Ação destrutiva em vermelho
+              onPress={confirmarSaida}>
               Sair
             </Button>
           </Dialog.Actions>
@@ -164,10 +162,12 @@ const CabecalhoMenu = () => {
 const styles = StyleSheet.create({
 
   container: {
-    backgroundColor: '#C0C0C0',
+    backgroundColor: '#1E1E1E', // Fundo combinando com o header do tema
     paddingTop: 25,
     paddingHorizontal: 20,
     paddingBottom: 10,
+    // Caso use num Drawer, essa borda arredondada ajuda no acabamento visual
+    borderBottomRightRadius: 20, 
   },
 
   usuario: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    backgroundColor: '#F2A900',
+    backgroundColor: '#2A2A2A', // Fundo escuro para o avatar padrão
   },
 
   informacoes: {
@@ -185,13 +185,13 @@ const styles = StyleSheet.create({
   },
 
   nome: {
-    color: '#FFFFFF',
+    color: '#F3F4F6', // Texto claro
     fontWeight: 'bold',
     fontSize: 19,
   },
 
   email: {
-    color: '#FFFFFF',
+    color: '#9CA3AF', // Texto secundário acinzentado
     marginTop: 3,
   },
 
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.3)',
+    borderTopColor: '#2C2C2C', // Linha separadora mais discreta
 
     flexDirection: 'row',
     alignItems: 'center',
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
 
   perfilTexto: {
-    color: '#FFFFFF',
+    color: '#F3F4F6', // Texto dos itens do menu mais legível
     fontWeight: 'bold',
   },
 

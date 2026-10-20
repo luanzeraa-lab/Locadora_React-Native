@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Avatar, Text, TextInput, Button, Divider, IconButton, } from 'react-native-paper';
+import { Avatar, Text, TextInput, Button, Divider, IconButton } from 'react-native-paper';
 
-//campo  de imagem
+// campo de imagem
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from './context/AuthContext';
 import { request } from './context/AuthContext';
 
 const Perfil = ({ navigation }) => {
 
-    // Dados do usuário -> receber os dados  via banco de dados
+    // Dados do usuário -> receber os dados via banco de dados
     const { user, setUser, signOut } = useAuth();
     const [nome, setNome] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
@@ -63,7 +63,7 @@ const Perfil = ({ navigation }) => {
             <View style={styles.cabecalho}>
                 {/* AVATAR */}
                 <View style={styles.avatarContainer}>
-                    { imagem ?( 
+                    { imagem ? ( 
                           // Mostra a imagem escolhida
                         <Image
                             source={{ uri: imagem }}
@@ -74,13 +74,14 @@ const Perfil = ({ navigation }) => {
                             size={100}
                             icon="account"
                             style={styles.avatar}
+                            color="#FFFFFF"
                         />
 
                     )}
                     {/* BOTÃO EDITAR */}
                     <IconButton
                         icon="pencil"
-                        iconColor="white"
+                        iconColor="#FFFFFF"
                         size={18}
                         style={styles.botaoEditar}
                         onPress={editarFoto}
@@ -88,9 +89,7 @@ const Perfil = ({ navigation }) => {
 
                 </View>
 
-
                 {/* TÍTULO */}
-
                 <Text
                     variant="headlineSmall"
                     style={styles.titulo}
@@ -105,9 +104,7 @@ const Perfil = ({ navigation }) => {
 
             </View>
 
-
-            <Divider />
-
+            <Divider style={{ backgroundColor: '#2C2C2C' }} />
 
             {/* ============================= */}
             {/* FORMULÁRIO */}
@@ -122,10 +119,14 @@ const Perfil = ({ navigation }) => {
                     value={nome}
                     onChangeText={setNome}
                     mode="outlined"
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6" // Cor da borda ao focar
+                    outlineColor="#2C2C2C" // Cor da borda normal
                     left={
-                        <TextInput.Icon icon="account" />
+                        <TextInput.Icon icon="account" color="#9CA3AF" />
                     }
                     style={styles.input}
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }} // Cor do placeholder
                 />
 
 
@@ -138,10 +139,14 @@ const Perfil = ({ navigation }) => {
                     mode="outlined"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
                     left={
-                        <TextInput.Icon icon="email" />
+                        <TextInput.Icon icon="email" color="#9CA3AF" />
                     }
                     style={styles.input}
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                 />
 
                 {/* NOVA SENHA */}
@@ -152,10 +157,14 @@ const Perfil = ({ navigation }) => {
                     onChangeText={setSenha}
                     mode="outlined"
                     secureTextEntry
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
                     left={
-                        <TextInput.Icon icon="lock" />
+                        <TextInput.Icon icon="lock" color="#9CA3AF" />
                     }
                     style={styles.input}
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                 />
 
 
@@ -167,6 +176,8 @@ const Perfil = ({ navigation }) => {
                     mode="contained"
                     icon="content-save"
                     onPress={salvarPerfil}
+                    buttonColor="#8B5CF6" // Cor pelo prop para evitar erro
+                    textColor="#FFFFFF"
                     style={styles.botao}
                 >
                     Salvar alterações
@@ -181,6 +192,7 @@ const Perfil = ({ navigation }) => {
                     mode="outlined"
                     icon="arrow-left"
                     onPress={() => navigation.goBack()}
+                    textColor="#8B5CF6"
                     style={styles.botaoVoltar}
                 >
                     Voltar
@@ -197,9 +209,8 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#121212', // Fundo principal escuro
     },
-
 
     // ==============================
     // CABEÇALHO
@@ -208,9 +219,10 @@ const styles = StyleSheet.create({
     cabecalho: {
         alignItems: 'center',
         paddingVertical: 30,
-        backgroundColor: '#C0C0C0',
+        backgroundColor: '#1E1E1E', // Destaque no cabeçalho
+        borderBottomWidth: 1,
+        borderBottomColor: '#2C2C2C', // Divisão suave
     },
-
 
     // ==============================
     // AVATAR
@@ -221,11 +233,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 
-
     avatar: {
-        backgroundColor: '#F2A900',
+        backgroundColor: '#2A2A2A', // Cinza para o avatar sem foto
     },
-
 
     // Imagem escolhida
     avatarImagem: {
@@ -233,9 +243,8 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         borderWidth: 3,
-        borderColor: '#FFFFFF',
+        borderColor: '#1E1E1E', // Borda da mesma cor do cabeçalho
     },
-
 
     // ==============================
     // BOTÃO EDITAR
@@ -243,34 +252,27 @@ const styles = StyleSheet.create({
 
     botaoEditar: {
         position: 'absolute',
-
         right: -8,
         bottom: -8,
-
-        backgroundColor: '#555555',
-
+        backgroundColor: '#8B5CF6', // Roxo de destaque
         margin: 0,
-
         borderWidth: 2,
-        borderColor: '#FFFFFF',
+        borderColor: '#1E1E1E', // Borda combinando com o fundo
     },
-
 
     // ==============================
     // TÍTULO
     // ==============================
 
     titulo: {
-        color: '#FFFFFF',
+        color: '#F3F4F6', // Texto claro
         fontWeight: 'bold',
     },
 
-
     subtitulo: {
-        color: '#FFFFFF',
+        color: '#9CA3AF', // Cinza médio
         marginTop: 5,
     },
-
 
     // ==============================
     // FORMULÁRIO
@@ -280,12 +282,10 @@ const styles = StyleSheet.create({
         padding: 20,
     },
 
-
     input: {
         marginBottom: 15,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#1E1E1E', // Fundo do input adaptado
     },
-
 
     // ==============================
     // BOTÃO SALVAR
@@ -294,9 +294,8 @@ const styles = StyleSheet.create({
     botao: {
         marginTop: 10,
         paddingVertical: 5,
-        backgroundColor: '#F2A900',
+        borderRadius: 12, // Borda arredondada suave
     },
-
 
     // ==============================
     // BOTÃO VOLTAR
@@ -305,9 +304,11 @@ const styles = StyleSheet.create({
     botaoVoltar: {
         marginTop: 15,
         paddingVertical: 5,
+        borderRadius: 12,
+        borderColor: '#8B5CF6',
+        borderWidth: 1,
     },
 
 });
-
 
 export { Perfil };

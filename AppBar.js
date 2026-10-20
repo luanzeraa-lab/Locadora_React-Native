@@ -20,6 +20,7 @@ export default function AppBar({ navigation }) {
     setEditing(content);
     setImageUrl(content.imageUrl);
   };
+
   const saveImage = async () => {
     try {
       await updateContent(editing._id, { imageUrl });
@@ -28,42 +29,64 @@ export default function AppBar({ navigation }) {
       Alert.alert('Erro', error.message);
     }
   };
+
   const remove = (content) => Alert.alert('Excluir conteúdo', `Excluir "${content.title}"?`, [
     { text: 'Cancelar', style: 'cancel' },
     { text: 'Excluir', style: 'destructive', onPress: () => deleteContent(content._id).catch((error) => Alert.alert('Erro', error.message)) },
   ]);
 
-  return <View style={styles.home}>
-    <Appbar.Header style={styles.header}>
-      <Appbar.Action icon="menu" iconColor="white" onPress={() => navigation.openDrawer()} />
-      <Appbar.Content title="Technologic" titleStyle={styles.titleLight} />
-      <Appbar.Action icon="magnify" iconColor="white" onPress={() => navigation.navigate('Pesquisa')} />
-      <Appbar.Action icon={canManage ? 'account-check' : 'account'} iconColor="white" onPress={() => navigation.navigate(canManage ? 'Perfil' : 'Acesso')} />
-    </Appbar.Header>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs} contentContainerStyle={styles.tabsContent}>
-      {tabs.map((tab) => (
-        <Pressable
-          key={tab}
-          accessibilityRole="button"
-          accessibilityState={{ selected: selectedTab === tab }}
-          onPress={() => setSelectedTab(tab)}
-          style={[styles.tab, selectedTab === tab && styles.activeTab]}
-        >
-          <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>{tab}</Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-    <ScrollView style={styles.cards} contentContainerStyle={styles.cardsContent}>
-      {loading ? <Text style={styles.emptyText}>Carregando conteúdos...</Text> : null}
-      {!loading && !visibleContents.length ? <Text style={styles.emptyText}>Nenhum conteúdo encontrado nesta categoria.</Text> : null}
-      {visibleContents.map((content) => <ModCard key={content._id} content={content} canManage={canManage} onEdit={edit} onDelete={remove} />)}
-    </ScrollView>
-    <Portal>
-      <Dialog visible={!!editing} onDismiss={() => setEditing(null)}>
-        <Dialog.Title>Editar imagem</Dialog.Title>
-        <Dialog.Content><TextInput label="URL da imagem" mode="outlined" value={imageUrl} onChangeText={setImageUrl} autoCapitalize="none" /></Dialog.Content>
-        <Dialog.Actions><Button onPress={() => setEditing(null)}>Cancelar</Button><Button onPress={saveImage}>Salvar</Button></Dialog.Actions>
-      </Dialog>
-    </Portal>
-  </View>;
+  return (
+    <View style={styles.home}>
+      <Appbar.Header style={styles.header}>
+        <Appbar.Action icon="menu" iconColor="#F3F4F6" onPress={() => navigation.openDrawer()} />
+        <Appbar.Content title="Technologic" titleStyle={styles.titleLight} />
+        <Appbar.Action icon="magnify" iconColor="#F3F4F6" onPress={() => navigation.navigate('Pesquisa')} />
+        <Appbar.Action icon={canManage ? 'account-check' : 'account'} iconColor="#F3F4F6" onPress={() => navigation.navigate(canManage ? 'Perfil' : 'Acesso')} />
+      </Appbar.Header>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabs} contentContainerStyle={styles.tabsContent}>
+        {tabs.map((tab) => (
+          <Pressable
+            key={tab}
+            accessibilityRole="button"
+            accessibilityState={{ selected: selectedTab === tab }}
+            onPress={() => setSelectedTab(tab)}
+            style={[styles.tab, selectedTab === tab && styles.activeTab]}
+          >
+            <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>{tab}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      <ScrollView style={styles.cards} contentContainerStyle={styles.cardsContent}>
+        {loading ? <Text style={styles.emptyText}>Carregando conteúdos...</Text> : null}
+        {!loading && !visibleContents.length ? <Text style={styles.emptyText}>Nenhum conteúdo encontrado nesta categoria.</Text> : null}
+        {visibleContents.map((content) => <ModCard key={content._id} content={content} canManage={canManage} onEdit={edit} onDelete={remove} />)}
+      </ScrollView>
+
+      <Portal>
+        <Dialog visible={!!editing} onDismiss={() => setEditing(null)} style={{ backgroundColor: '#1E1E1E' }}>
+          <Dialog.Title style={{ color: '#F3F4F6' }}>Editar imagem</Dialog.Title>
+          <Dialog.Content>
+            <TextInput 
+              label="URL da imagem" 
+              mode="outlined" 
+              value={imageUrl} 
+              onChangeText={setImageUrl} 
+              autoCapitalize="none"
+              textColor="#F3F4F6"
+              activeOutlineColor="#8B5CF6"
+              outlineColor="#2C2C2C"
+              style={{ backgroundColor: '#1E1E1E' }}
+              theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button textColor="#9CA3AF" onPress={() => setEditing(null)}>Cancelar</Button>
+            <Button textColor="#8B5CF6" onPress={saveImage}>Salvar</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </View>
+  );
 }
