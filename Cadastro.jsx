@@ -23,17 +23,28 @@ const Cadastro = ({ navigation }) => {
     const [mostrarConfirmacao, setMostrarConfirmacao] = React.useState(false);
     const { signUp } = useAuth();
     const [sending, setSending] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const cadastrar = async () => {
-        if (!nome.trim() || !email.trim() || !senha) return Alert.alert('Atenção', 'Preencha todos os campos.');
-        if (senha.length < 6) return Alert.alert('Atenção', 'A senha deve ter pelo menos 6 caracteres.');
-        if (senha !== confirmarSenha) return Alert.alert('Atenção', 'As senhas não coincidem.');
+        setErrorMessage('');
+        if (!nome.trim() || !email.trim() || !senha) {
+            setErrorMessage('Preencha todos os campos.');
+            return;
+        }
+        if (senha.length < 6) {
+            setErrorMessage('A senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
+        if (senha !== confirmarSenha) {
+            setErrorMessage('As senhas não coincidem.');
+            return;
+        }
         setSending(true);
         try {
             await signUp(nome.trim(), email.trim(), senha);
             navigation.replace('Home');
         } catch (error) {
-            Alert.alert('Não foi possível cadastrar', error.message);
+            setErrorMessage(error.message || 'Não foi possível cadastrar.');
         } finally {
             setSending(false);
         }
@@ -79,6 +90,12 @@ const Cadastro = ({ navigation }) => {
                     Preencha os dados abaixo
                 </Text>
 
+                {errorMessage ? (
+                    <Text style={{ color: '#F87171', marginBottom: 15, textAlign: 'center' }}>
+                        {errorMessage}
+                    </Text>
+                ) : null}
+
 
                 {/* NOME */}
 
@@ -88,6 +105,10 @@ const Cadastro = ({ navigation }) => {
                     value={nome}
                     onChangeText={setNome}
                     mode="outlined"
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                     left={
                         <TextInput.Icon icon="account" />
                     }
@@ -105,6 +126,10 @@ const Cadastro = ({ navigation }) => {
                     mode="outlined"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                     left={
                         <TextInput.Icon icon="email" />
                     }
@@ -121,6 +146,10 @@ const Cadastro = ({ navigation }) => {
                     onChangeText={setSenha}
                     mode="outlined"
                     secureTextEntry={!mostrarSenha}
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                     left={
                         <TextInput.Icon icon="lock" />
                     }
@@ -145,6 +174,10 @@ const Cadastro = ({ navigation }) => {
                     onChangeText={setConfirmarSenha}
                     mode="outlined"
                     secureTextEntry={!mostrarConfirmacao}
+                    textColor="#F3F4F6"
+                    activeOutlineColor="#8B5CF6"
+                    outlineColor="#2C2C2C"
+                    theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
                     left={
                         <TextInput.Icon icon="lock-check" />
                     }

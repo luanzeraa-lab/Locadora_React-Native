@@ -1,13 +1,39 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const dns = require('dns');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const mongoose = require('mongoose');
+require('dotenv').config();
 const { User, Content } = require('./models');
 const { createToken, authRequired } = require('./auth');
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
+const uploadsDirectory = path.join(__dirname, '..', 'uploads');
+fs.mkdirSync(uploadsDirectory, { recursive: true });
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadsDirectory,
+    filename: (req, file, callback) => {
+      const extension = path.extname(file.originalname).toLowerCase();
+      callback(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${extension}`);
+    },
+  }),
+  fileFilter: (req, file, callback) => {
+    const extension = path.extname(file.originalname || '').toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+    const isAllowedType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype);
+    if (isAllowedType || allowedExtensions.includes(extension)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Envie uma imagem JPG, PNG ou WebP. Tipo recebido: ' + (file.mimetype || 'desconhecido')));
+  },
+});
+app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'technologic-api' }));
 
@@ -58,6 +84,11 @@ app.get('/api/auth/me', authRequired, async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+});
+
+app.post('/api/uploads/image', authRequired, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'Selecione uma imagem JPG, PNG ou WebP.' });
+  return res.status(201).json({ imageUrl: `/uploads/${req.file.filename}` });
 });
 
 app.put('/api/auth/me', authRequired, async (req, res, next) => {
@@ -121,15 +152,26 @@ app.delete('/api/contents/:id', authRequired, async (req, res, next) => {
 
 app.use((error, req, res, next) => {
   console.error(error);
+  if (error instanceof multer.MulterError || error.message?.startsWith('Envie uma imagem')) {
+    return res.status(400).json({ message: error.message });
+  }
   return res.status(500).json({ message: 'Erro interno do servidor.' });
 });
 
 const port = 3333;
 async function start() {
-  await mongoose.connect(
-    'mongodb+srv://luan:minhanovasenha@cluster0.5ozoan9.mongodb.net/technologic'
-    , { tls: true }
-  );
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    throw new Error('MONGODB_URI não definida. Configure a variável em server/.env.');
+  }
+  const dnsServers = (process.env.MONGODB_DNS_SERVERS || '')
+    .split(',')
+    .map((server) => server.trim())
+    .filter(Boolean);
+  if (dnsServers.length) dns.setServers(dnsServers);
+  await mongoose.connect(mongoUri, {
+    serverSelectionTimeoutMS: 10000,
+  });
   app.listen(port, '0.0.0.0', () => console.log(`API disponível em http://localhost:${port}`));
 }
 

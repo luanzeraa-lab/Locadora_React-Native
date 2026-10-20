@@ -52,7 +52,8 @@ function StackNavigator() {
 
 
 function DrawerNavigation() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return <SplashScreen />;
   return (
     <Drawer.Navigator screenOptions={{
       headerShown: false

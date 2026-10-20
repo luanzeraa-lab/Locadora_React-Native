@@ -1,26 +1,72 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
-import { Button, Text, TextInput } from 'react-native-paper';
+import { ScrollView, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Appbar, Button, Text, TextInput } from 'react-native-paper';
 import { useContents } from './context/ContentContext';
+import { useAuth } from './context/AuthContext';
+import { uploadImage } from './context/AuthContext';
 import { styles } from './css/Styles';
 
-export default function GerenciarConteudos() {
+const emptyForm = { title: '', subtitle: '', imageUrl: '', description: '' };
+
+export default function GerenciarConteudos({ navigation }) {
   const { createContent } = useContents();
-  const [form, setForm] = useState({ title: '', subtitle: '', imageUrl: '', description: '' });
+  const { user, loading } = useAuth();
+  const [form, setForm] = useState(emptyForm);
+  const [status, setStatus] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
 
+  if (loading) return null;
+  if (!user) {
+    return (
+      <View style={styles.adminContainer}>
+        <Text style={styles.emptyText}>Faça login para acessar a área administrativa.</Text>
+      </View>
+    );
+  }
+
   const save = async () => {
+    setStatus(null);
     try {
       await createContent(form);
-      setForm({ title: '', subtitle: '', imageUrl: '', description: '' });
-      Alert.alert('Sucesso', 'Conteúdo cadastrado.');
+      setForm(emptyForm);
+      setStatus({ type: 'success', message: 'Conteúdo cadastrado com sucesso.' });
     } catch (error) {
-      Alert.alert('Não foi possível cadastrar', error.message);
+      setStatus({ type: 'error', message: error.message || 'Não foi possível cadastrar o conteúdo.' });
     }
   };
 
+  const chooseImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+    });
+    if (result.canceled) return;
+    setUploading(true);
+    setStatus(null);
+    try {
+      update('imageUrl', await uploadImage(result.assets[0]));
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const cancel = () => {
+    setForm(emptyForm);
+    setStatus(null);
+  };
+
   return (
-    <ScrollView style={styles.adminContainer} contentContainerStyle={styles.adminContent}>
+    <View style={styles.adminContainer}>
+      <Appbar.Header style={styles.header}>
+        <Appbar.BackAction iconColor="#F3F4F6" onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Gerenciar conteúdos" titleStyle={styles.titleLight} />
+      </Appbar.Header>
+
+      <ScrollView contentContainerStyle={styles.adminContent}>
       
       <Text variant="headlineSmall" style={styles.adminTitle}>
         Gerenciar conteúdos
@@ -29,6 +75,12 @@ export default function GerenciarConteudos() {
       <Text style={styles.adminDescription}>
         Cadastre uma nova série ou imagem para exibição pública.
       </Text>
+
+      {status ? (
+        <Text style={status.type === 'success' ? styles.successText : styles.errorText}>
+          {status.message}
+        </Text>
+      ) : null}
       
       <TextInput 
         label="Título" 
@@ -54,18 +106,10 @@ export default function GerenciarConteudos() {
         style={styles.input} 
       />
       
-      <TextInput 
-        label="URL da imagem" 
-        mode="outlined" 
-        value={form.imageUrl} 
-        onChangeText={(value) => update('imageUrl', value)} 
-        autoCapitalize="none" 
-        textColor="#F3F4F6"
-        activeOutlineColor="#8B5CF6"
-        outlineColor="#2C2C2C"
-        theme={{ colors: { onSurfaceVariant: '#9CA3AF' } }}
-        style={styles.input} 
-      />
+      <Button mode="outlined" icon="image-plus" onPress={chooseImage} loading={uploading} disabled={uploading} textColor="#F3F4F6" style={styles.adminCancelButton}>
+        {form.imageUrl ? 'Trocar imagem' : 'Escolher imagem'}
+      </Button>
+      {form.imageUrl ? <Text style={styles.imageSelectedText}>Imagem selecionada.</Text> : null}
       
       <TextInput 
         label="Descrição" 
@@ -91,7 +135,17 @@ export default function GerenciarConteudos() {
       >
         Cadastrar conteúdo
       </Button>
-      
-    </ScrollView>
+
+      <Button
+        mode="outlined"
+        icon="close"
+        onPress={cancel}
+        textColor="#F3F4F6"
+        style={styles.adminCancelButton}
+      >
+        Cancelar
+      </Button>
+      </ScrollView>
+    </View>
   );
 }

@@ -64,6 +64,19 @@ export const styles = StyleSheet.create({
         color: '#6B7280',
         fontStyle: 'italic',
     },
+
+    errorText: {
+        textAlign: 'center',
+        marginTop: 20,
+        color: '#F87171',
+    },
+
+    successText: {
+        textAlign: 'center',
+        marginBottom: 15,
+        color: '#86EFAC',
+        fontWeight: '600',
+    },
     
     searchInput: {
         margin: 20,
@@ -99,6 +112,18 @@ export const styles = StyleSheet.create({
         marginBottom: 20,
         color: '#9CA3AF',
         lineHeight: 22,
+    },
+
+    adminCancelButton: {
+        marginTop: 10,
+        borderColor: '#6B7280',
+        borderRadius: 12,
+    },
+
+    imageSelectedText: {
+        color: '#86EFAC',
+        marginBottom: 10,
+        marginTop: -8,
     },
     
     tabs: {

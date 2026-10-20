@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { Alert, View, StyleSheet } from 'react-native';
 import { Avatar, Text, IconButton, Portal, Dialog, Button } from 'react-native-paper';
-import { Icon } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from './context/AuthContext';
 
@@ -10,9 +9,9 @@ const CabecalhoMenu = () => {
   const navigation = useNavigation();
   const [dialogSair, setDialogSair] = useState(false);
 
-  const confirmarSaida = () => {
+  const confirmarSaida = async () => {
     setDialogSair(false);
-    signOut();
+    await signOut();
     navigation.navigate('Início', { screen: 'Acesso' });
   };
 
@@ -76,7 +75,7 @@ const CabecalhoMenu = () => {
           icon="bell"
           iconColor="#F3F4F6"
           size={24}
-          onPress={() => {}}
+          onPress={() => Alert.alert('Notificações', 'Nenhuma notificação nova.')}
         />
       </View>
 
@@ -111,20 +110,17 @@ const CabecalhoMenu = () => {
         </View>
       ) : null}
 
-      {/* Área do sair */}
-      <View style={styles.perfil}>
-        <Text
-          variant="bodyMedium"
-          style={styles.perfilTexto}>
-          Sair
-        </Text>
-        <IconButton
-          icon="logout"
-          iconColor="#EF4444" // Destacando o ícone de sair com vermelho suave
-          size={24}
-          onPress={() => setDialogSair(true)}
-        />
-      </View>
+      {user ? (
+        <View style={styles.perfil}>
+          <Text variant="bodyMedium" style={styles.perfilTexto}>Sair</Text>
+          <IconButton
+            icon="logout"
+            iconColor="#EF4444"
+            size={24}
+            onPress={() => setDialogSair(true)}
+          />
+        </View>
+      ) : null}
 
 
       {/* Dialog de confirmação */}

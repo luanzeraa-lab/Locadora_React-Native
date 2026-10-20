@@ -4,17 +4,22 @@ import { Appbar, Button, Dialog, Portal, Text, TextInput } from 'react-native-pa
 import { styles } from './css/Styles';
 import ModCard from './Cards';
 import { useContents } from './context/ContentContext';
+import * as ImagePicker from 'expo-image-picker';
+import { uploadImage } from './context/AuthContext';
 
 export default function AppBar({ navigation }) {
   const { contents, loading, canManage, updateContent, deleteContent } = useContents();
   const [editing, setEditing] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Séries');
 
-  const tabs = ['Séries', 'Tecnologia', 'Lançamentos', 'Favoritos'];
-  const visibleContents = selectedTab === 'Favoritos'
-    ? []
-    : contents.filter((content) => (content.category || 'Séries') === selectedTab);
+  const tabs = ['Séries', 'Filmes', 'Todos', 'Favoritos'];
+  const visibleContents = selectedTab === 'Todos'
+    ? contents
+    : selectedTab === 'Favoritos'
+      ? []
+      : contents.filter((content) => (content.category || 'Séries') === selectedTab);
 
   const edit = (content) => {
     setEditing(content);
@@ -27,6 +32,19 @@ export default function AppBar({ navigation }) {
       setEditing(null);
     } catch (error) {
       Alert.alert('Erro', error.message);
+    }
+  };
+
+  const chooseReplacementImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true });
+    if (result.canceled) return;
+    setUploading(true);
+    try {
+      setImageUrl(await uploadImage(result.assets[0]));
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -68,6 +86,7 @@ export default function AppBar({ navigation }) {
         <Dialog visible={!!editing} onDismiss={() => setEditing(null)} style={{ backgroundColor: '#1E1E1E' }}>
           <Dialog.Title style={{ color: '#F3F4F6' }}>Editar imagem</Dialog.Title>
           <Dialog.Content>
+            <Button icon="image-plus" textColor="#8B5CF6" onPress={chooseReplacementImage} loading={uploading} disabled={uploading}>Escolher arquivo</Button>
             <TextInput 
               label="URL da imagem" 
               mode="outlined" 
@@ -83,7 +102,7 @@ export default function AppBar({ navigation }) {
           </Dialog.Content>
           <Dialog.Actions>
             <Button textColor="#9CA3AF" onPress={() => setEditing(null)}>Cancelar</Button>
-            <Button textColor="#8B5CF6" onPress={saveImage}>Salvar</Button>
+            <Button textColor="#8B5CF6" onPress={saveImage} disabled={uploading}>Salvar</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

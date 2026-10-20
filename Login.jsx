@@ -18,15 +18,20 @@ const Login = ({ navigation }) => {
     const [mostrarSenha, setMostrarSenha] = React.useState(false);
     const { signIn } = useAuth();
     const [sending, setSending] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const entrar = async () => {
-        if (!email.trim() || !senha) return Alert.alert('Atenção', 'Informe e-mail e senha.');
+        setErrorMessage('');
+        if (!email.trim() || !senha) {
+            setErrorMessage('Informe e-mail e senha.');
+            return;
+        }
         setSending(true);
         try {
             await signIn(email.trim(), senha);
             navigation.replace('Home');
         } catch (error) {
-            Alert.alert('Não foi possível entrar', error.message);
+            setErrorMessage(error.message || 'Não foi possível entrar.');
         } finally {
             setSending(false);
         }
@@ -72,6 +77,12 @@ const Login = ({ navigation }) => {
                 >
                     Entre com sua conta
                 </Text>
+
+                {errorMessage ? (
+                    <Text style={{ color: '#F87171', marginBottom: 15, textAlign: 'center' }}>
+                        {errorMessage}
+                    </Text>
+                ) : null}
 
 
                 {/* E-MAIL */}
