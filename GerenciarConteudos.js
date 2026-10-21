@@ -91,7 +91,7 @@ export default function GerenciarConteudos({ navigation }) {
           { value: 'Filmes', label: 'Filme' },
         ]}
         style={styles.categorySelector}
-        theme={{ colors: { secondaryContainer: '#8B5CF6', onSecondaryContainer: '#FFFFFF', outline: '#6B7280' } }}
+        theme={{ colors: { secondaryContainer: '#8B5CF6', onSecondaryContainer: '#FFFFFF', onSurface: '#FFFFFF', outline: '#6B7280' } }}
       />
       
       <TextInput 

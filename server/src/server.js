@@ -167,10 +167,40 @@ app.put('/api/contents/:id', authRequired, async (req, res, next) => {
   }
 });
 
+app.delete('/api/contents/:id/image', authRequired, async (req, res, next) => {
+  try {
+    const content = await Content.findById(req.params.id);
+    if (!content) return res.status(404).json({ message: 'Conteúdo não encontrado.' });
+
+    const previousImageUrl = content.imageUrl;
+    content.imageUrl = '';
+    await content.save();
+
+    if (previousImageUrl?.startsWith('/uploads/')) {
+      const filename = path.basename(previousImageUrl);
+      await fs.promises.unlink(path.join(uploadsDirectory, filename)).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      });
+    }
+
+    return res.json(content);
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.delete('/api/contents/:id', authRequired, async (req, res, next) => {
   try {
     const content = await Content.findByIdAndDelete(req.params.id);
     if (!content) return res.status(404).json({ message: 'Conteúdo não encontrado.' });
+
+    if (content.imageUrl?.startsWith('/uploads/')) {
+      const filename = path.basename(content.imageUrl);
+      await fs.promises.unlink(path.join(uploadsDirectory, filename)).catch((error) => {
+        if (error.code !== 'ENOENT') throw error;
+      });
+    }
+
     return res.status(204).send();
   } catch (error) {
     return next(error);

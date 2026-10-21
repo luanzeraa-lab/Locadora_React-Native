@@ -20,7 +20,7 @@ export default function ModCard({ content, canManage, onEdit, onDelete, onFavori
           />
         )}
       />
-      <Card.Cover style={styles.cardCover} source={{ uri: content.imageUrl }} />
+      {content.imageUrl ? <Card.Cover style={styles.cardCover} source={{ uri: content.imageUrl }} /> : null}
       
       {content.description ? (
         <Card.Content>

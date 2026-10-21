@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { Appbar, Button, Dialog, Portal, Text, TextInput } from 'react-native-paper';
 import { styles } from './css/Styles';
 import ModCard from './Cards';
 import { useContents } from './context/ContentContext';
 import * as ImagePicker from 'expo-image-picker';
-import { uploadImage } from './context/AuthContext';
+import { uploadImage, useAuth } from './context/AuthContext';
 
 export default function AppBar({ navigation }) {
   const { contents, loading, canManage, updateContent, deleteContent, toggleFavorite } = useContents();
+  const { user } = useAuth();
   const [editing, setEditing] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Séries');
+  const [contentToDelete, setContentToDelete] = useState(null);
 
   const tabs = ['Séries', 'Filmes', 'Todos', 'Favoritos'];
+  useEffect(() => {
+    if (!user) setSelectedTab('Séries');
+  }, [user]);
+
   const visibleContents = selectedTab === 'Todos'
     ? contents
     : selectedTab === 'Favoritos'
@@ -48,10 +54,17 @@ export default function AppBar({ navigation }) {
     }
   };
 
-  const remove = (content) => Alert.alert('Excluir conteúdo', `Excluir "${content.title}"?`, [
-    { text: 'Cancelar', style: 'cancel' },
-    { text: 'Excluir', style: 'destructive', onPress: () => deleteContent(content._id).catch((error) => Alert.alert('Erro', error.message)) },
-  ]);
+  const remove = (content) => setContentToDelete(content);
+
+  const confirmDelete = async () => {
+    const content = contentToDelete;
+    setContentToDelete(null);
+    try {
+      await deleteContent(content._id);
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
 
   const favorite = async (content) => {
     if (!canManage) {
@@ -95,6 +108,22 @@ export default function AppBar({ navigation }) {
       </ScrollView>
 
       <Portal>
+        <Dialog
+          visible={!!contentToDelete}
+          onDismiss={() => setContentToDelete(null)}
+          style={{ backgroundColor: '#1E1E1E' }}
+        >
+          <Dialog.Title style={{ color: '#F3F4F6' }}>Excluir conteúdo</Dialog.Title>
+          <Dialog.Content>
+            <Text style={{ color: '#D1D5DB' }}>
+              Tem certeza que deseja excluir "{contentToDelete?.title}"? Esta ação não pode ser desfeita.
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button textColor="#9CA3AF" onPress={() => setContentToDelete(null)}>Cancelar</Button>
+            <Button textColor="#EF4444" onPress={confirmDelete}>Excluir</Button>
+          </Dialog.Actions>
+        </Dialog>
         <Dialog visible={!!editing} onDismiss={() => setEditing(null)} style={{ backgroundColor: '#1E1E1E' }}>
           <Dialog.Title style={{ color: '#F3F4F6' }}>Editar imagem</Dialog.Title>
           <Dialog.Content>
