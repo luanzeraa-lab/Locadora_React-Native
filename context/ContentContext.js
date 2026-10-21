@@ -29,12 +29,6 @@ export function ContentProvider({ children }) {
     const content = await request(`/contents/${id}`, { method: 'PUT', body: JSON.stringify(data) });
     setContents((items) => items.map((item) => item._id === id ? content : item));
   };
-  const removeContentImage = async (id) => {
-    await request(`/contents/${id}/image`, { method: 'DELETE' });
-    setContents((items) => items.map((item) => (
-      item._id === id ? { ...item, imageUrl: '' } : item
-    )));
-  };
   const deleteContent = async (id) => {
     const removedIndex = contents.findIndex((item) => item._id === id);
     const removedContent = removedIndex >= 0 ? contents[removedIndex] : null;
@@ -61,7 +55,7 @@ export function ContentProvider({ children }) {
     )));
   };
 
-  return <ContentContext.Provider value={{ contents, loading, loadContents, createContent, updateContent, removeContentImage, deleteContent, toggleFavorite, canManage: !!user }}>
+  return <ContentContext.Provider value={{ contents, loading, loadContents, createContent, updateContent, deleteContent, toggleFavorite, canManage: !!user }}>
     {children}
   </ContentContext.Provider>;
 }

@@ -10,7 +10,7 @@ import { request } from './context/AuthContext';
 const Perfil = ({ navigation }) => {
 
     // Dados do usuário -> receber os dados via banco de dados
-    const { user, setUser, signOut } = useAuth();
+    const { user, setUser } = useAuth();
     const [nome, setNome] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
     const [senha, setSenha] = useState('');

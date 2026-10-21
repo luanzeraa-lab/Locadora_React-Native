@@ -35,8 +35,10 @@ const upload = multer({
 });
 app.use('/uploads', express.static(uploadsDirectory));
 
+
 app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'technologic-api' }));
 
+//Valida dados, verifica e-mail duplicado, gera hash com bcrypt e retorna JWT.
 app.post('/api/auth/register', async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -61,6 +63,7 @@ app.post('/api/auth/register', async (req, res, next) => {
   }
 });
 
+//	Confere e-mail e senha e retorna JWT e dados básicos do usuário.
 app.post('/api/auth/login', async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email?.trim().toLowerCase() });
@@ -76,6 +79,7 @@ app.post('/api/auth/login', async (req, res, next) => {
   }
 });
 
+//Recupera o usuário autenticado sem o hash de senha.
 app.get('/api/auth/me', authRequired, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('-passwordHash');
@@ -86,11 +90,13 @@ app.get('/api/auth/me', authRequired, async (req, res, next) => {
   }
 });
 
+//Faz upload de uma imagem.
 app.post('/api/uploads/image', authRequired, upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Selecione uma imagem JPG, PNG ou WebP.' });
   return res.status(201).json({ imageUrl: `/uploads/${req.file.filename}` });
 });
 
+//Atualiza nome, avatar e senha do usuário autenticado.
 app.put('/api/auth/me', authRequired, async (req, res, next) => {
   try {
     const updates = {};
@@ -104,6 +110,8 @@ app.put('/api/auth/me', authRequired, async (req, res, next) => {
   }
 });
 
+
+//Retorna lista de conteúdos, filtrando 
 app.get('/api/contents', authOptional, async (req, res, next) => {
   try {
     const filter = req.query.search
@@ -122,6 +130,7 @@ app.get('/api/contents', authOptional, async (req, res, next) => {
   }
 });
 
+//Adiciona ou remove conteúdo dos favoritos 
 app.post('/api/contents/:id/favorite', authRequired, async (req, res, next) => {
   try {
     const content = await Content.findById(req.params.id).select('_id');
@@ -139,6 +148,7 @@ app.post('/api/contents/:id/favorite', authRequired, async (req, res, next) => {
   }
 });
 
+//Cria novo conteúdo
 app.post('/api/contents', authRequired, async (req, res, next) => {
   try {
     const { title, subtitle, imageUrl, description, category } = req.body;
@@ -157,6 +167,7 @@ app.post('/api/contents', authRequired, async (req, res, next) => {
   }
 });
 
+//Atualiza conteúdo existente
 app.put('/api/contents/:id', authRequired, async (req, res, next) => {
   try {
     const content = await Content.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -167,28 +178,7 @@ app.put('/api/contents/:id', authRequired, async (req, res, next) => {
   }
 });
 
-app.delete('/api/contents/:id/image', authRequired, async (req, res, next) => {
-  try {
-    const content = await Content.findById(req.params.id);
-    if (!content) return res.status(404).json({ message: 'Conteúdo não encontrado.' });
-
-    const previousImageUrl = content.imageUrl;
-    content.imageUrl = '';
-    await content.save();
-
-    if (previousImageUrl?.startsWith('/uploads/')) {
-      const filename = path.basename(previousImageUrl);
-      await fs.promises.unlink(path.join(uploadsDirectory, filename)).catch((error) => {
-        if (error.code !== 'ENOENT') throw error;
-      });
-    }
-
-    return res.json(content);
-  } catch (error) {
-    return next(error);
-  }
-});
-
+//Exclui conteúdo existente
 app.delete('/api/contents/:id', authRequired, async (req, res, next) => {
   try {
     const content = await Content.findByIdAndDelete(req.params.id);
